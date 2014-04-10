@@ -7,6 +7,9 @@
     <title>个人资料</title>
     <link rel="stylesheet" type="text/css" href="./assets/css/webapp/wei_dialog.css">
     <link rel="stylesheet" type="text/css" href="./assets/css/webapp/wei_webapp.css">
+    <script type="text/javascript" src="./vendor/libs/seajs/2.0.0/sea.js"></script>
+    <script type="text/javascript" src="./assets/js/webapp/wei_webapp_common.js"></script>
+    <script type="text/javascript" src="./assets/js/webapp/wei_webapp.js"></script>
 </head>
 <body id="page_profile">
     <div class="header">
@@ -22,13 +25,13 @@
     <nav>
         <ul class="round">
             <li>
-                <a href="javascript:;" class="arrow"><span class="right">一年一班</span>班级 </a>
+                <a href="javascript:;" class="" id="classLink"><span class="right">一年一班</span>班级 </a>
             </li>
             <li>
-                <a href="javascript:;" class="arrow"><span class="right">女</span>性别</a>
+                <a href="javascript:;" class="arrow" id="profileSex"><span class="right">女</span>性别</a>
             </li>
             <li>
-                <a href="javascript:;" class="arrow"><span class="right">1990-11-11</span>生日 </a>
+                <a href="javascript:;" class="arrow" id="profileBirth"><span class="right">1990-11-11</span>生日 </a>
             </li>
             <li>
                 <a href="javascript:;" class="arrow"><span class="right">杨过</span>我的爸爸 </a>
@@ -71,6 +74,13 @@
         </ul>
     </nav>
 
+    <script type="text/javascript">
+        
+        seajs.use(['underscore','mobile'],function(_,mobile){
+           
+        });
+
+    </script>
 
 </body>
 </html>

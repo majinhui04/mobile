@@ -258,7 +258,7 @@ var _env = (function() {
             removeExpires: _removeExpires
         };
     }()),
-    // 
+    // hash ??
     MURLHash = (function() {
         function _map2query(q, separator) {
             var u = encodeURIComponent,
