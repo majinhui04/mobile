@@ -9,8 +9,21 @@ define(function(require, exports, module) {
     };
     // 默认ajax前缀
     var ajaxApi = 'http://m.igrow.cn/api/1.1b';
-
+    var Cache = {};
     var HTTP = {
+        tpl: function(url,successCallback, failCallback, always) {
+            var dfd = $.Deferred();
+
+            if(Cache[url]){
+                dfd.resolve(Cache[url]);
+                return dfd.promise();
+            }else{
+                return this.ajax(url, {}, { type: 'GET' ,dataType:'html' }).done(function(result) {
+                    Cache[url] = result;
+                });
+            }
+            
+        },
         ajax: function (url, data , opts,successCallback,failCallback,always) {
             var self = this,
                 data = data || {},
@@ -22,7 +35,7 @@ define(function(require, exports, module) {
                 context = opts.context || self,
                 request;
 
-        
+            
             request = $.ajax({
                 'url': url,
                 'type': type,
@@ -176,8 +189,93 @@ define(function(require, exports, module) {
         return resourse;
 
     };
+    
+    var mDailogDefault = {
+        auto:true,
+        modal:true
+    };
+    function MDialog(options){
+        this.options = $.extend({},mDailogDefault,options || {});
+
+        this.init();
+    }
+    MDialog.prototype = {
+        constructor: MDialog,
+     
+        show: function() {
+            var options = this.options,
+                $container = this.$container;
+
+            options.beforeShow && options.beforeShow();
+            centerElement($container);
+            if (true === options.modal) {
+                this.$modal = makeModal({});
+            }
+
+        },
+        hide:function() {
+            var options = this.options,
+                $container = this.$container;
+
+            $container.css({
+                left: '-9999px',
+                top: '-9999px'
+            });
+            this.$modal && this.$modal.remove();
+        },
+        init: function() {
+            var self = this,options = this.options,auto = options.auto;
+
+            self.initDialog.done(function(){
+                self.bind();
+
+                if(auto){
+                    self.show();
+                }
+            });
+        },
+        initDialog:function() {
+            var self = this,
+                options = this.options,
+                dialogTplUrl = options.dialogTplUrl,
+                $dialog = options.$dialog,
+                dfd = $.Deferred();
+
+            if(dialogTplUrl){
+                HTTP.tpl(dialogTplUrl).done(function(dialogTpl){
+                    self.$container = $(dialogTpl).appendTo( $('body') );
+                    dfd.resolve();
+
+                }).fail(function(result){
+                    alert(result.message);
+                });
+
+            }else if($dialog && $dialog.length){
+                self.$container = $dialog;
+                dfd.resolve();
+
+            }else{
+                dfd.reject();
+            }
+
+            return def.promise();
+        },
+        render: function() {
+
+        },
+        bind: function() {
+            var self = this, options = this.options, $container = options;
+
+
+        },
+        sync: function() {
+
+        }
+    };
+
 
     var Mobile = {
+        cache:Cache,
         alert: function(content) {
             MDialog.alert('', content, '', '确定');
         },
@@ -190,29 +288,88 @@ define(function(require, exports, module) {
         hideLoading: function() {
             MLoading.hide();
         },
+
         test: function() {
-            $.ajax({
-                url: 'http://192.168.1.195/mobile/assets/data/test.json',
-                type: 'GET',
-                dataType: 'json',
-                data: {
-                    param1: 'value1'
-                },
-            })
-                .done(function(result) {
-                    console.log("success", result);
-                })
-                .fail(function(result) {
-                    console.log("error", result);
-                })
-                .always(function(result) {
-                    console.log("complete", result);
-                });
+            
 
         }
     };
     Mobile.$resource = $resource;
+    Mobile.http = HTTP;
+    $.extend(Mobile,Common);
     window['Mobile'] = Mobile;
+
+
+    function makeModal(options) {
+        var options = options || {},
+            zIndex = options.zIndex || 900,
+            opacity = options.opacity || 0.5;
+            win = getClient(),
+            backgroundColor = options.backgroundColor || '#000',
+            height = win.h,
+            position = options.position || 'fixed',
+            id = 'modal_' + new Date().getTime(),
+            tmpl = '<div class="m-modal"><a href="javascript:;" style="display:block;"></a></div>';
+
+        $modal = $(tmpl).appendTo($('body'));
+        $modal.css({
+            left:0,
+            top:0,
+            position:position,
+            width:'100%',
+            zIndex: zIndex,
+            opacity: opacity,
+            backgroundColor:backgroundColor
+        }).attr('id',id);
+
+        $modal.find('a').css('height',height);
+
+        return $modal;
+    }
+    function removeModal($element) {
+        if ($element) {
+            $element.remove();
+        }else {
+            $('.m-modal').remove();
+        }
+    }
+    function getClient(e){
+        if (e) {
+            w = e.clientWidth;
+            h = e.clientHeight;
+        } else {
+            w = (window.innerWidth) ? window.innerWidth : (document.documentElement && document.documentElement.clientWidth) ? document.documentElement.clientWidth : document.body.offsetWidth;
+            h = (window.innerHeight) ? window.innerHeight : (document.documentElement && document.documentElement.clientHeight) ? document.documentElement.clientHeight : document.body.offsetHeight;
+        }
+        return {w:w,h:h};
+    }
+    
+    function centerElement($element,width,height) {
+        var win = this.getClient(),
+            winHeight = win.h,
+            winWidth = win.w,
+            element = $element[0],
+            width = width || element.offsetWidth,
+            height =  height || element.offsetHeight,
+            scrollTop,
+            top,left;
+            
+        left =  Math.floor( (winWidth-width)*0.5 );
+
+        element.style.width = width+'px';
+        
+        element.style.left = left+'px';
+        
+        //谷歌下不能立即获取scrollTop
+        setTimeout(function(){
+            
+            //scrollTop = Math.max(document.documentElement.scrollTop,document.body.scrollTop)
+            top = Math.floor( (winHeight-height)*0.45 );
+            element.style.top = top+'px';
+          
+            
+        },30);
+    }
 
     return Mobile;
 });

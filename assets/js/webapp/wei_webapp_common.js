@@ -208,7 +208,7 @@ define(function(require, exports, module) {
                 }
             };
         }()),
-        // 本地存储
+        // 本地存储 
         MStorage = (function() {
             var _session = window.sessionStorage,
                 _local = window.localStorage,
@@ -227,13 +227,13 @@ define(function(require, exports, module) {
                         ts: (new Date).getTime()
                     };
                     d = JSON.stringify(d);
-                    _session.setItem(k, d);
-                    _local.setItem(k, d);
+                    //_session.setItem(k, v);
+                    _local.setItem(k, v);
                 }, _clear = function() {
-                    _session.clear();
+                    //_session.clear();
                     _local.clear();
                 }, _remove = function(k) {
-                    _session.removeItem(k);
+                    //_session.removeItem(k);
                     _local.removeItem(k);
                 }, _removeExpires = function(time) {
                     var now = (new Date).getTime(),
@@ -242,13 +242,21 @@ define(function(require, exports, module) {
                         data = MStorage.getData(key);
                         if (now - data.ts > time) {
                             _local.removeItem(key);
-                            _session.removeItem(key);
+                            //_session.removeItem(key);
                         }
+                    }
+                }, _setData = function(k,data) {
+                    var d;
+                    if(typeof data === 'object') {
+                        data.ts = (new Date).getTime();
+                        d = JSON.stringify(data);
+                        _local.setItem(k, d);
                     }
                 };
             return {
                 set: _set,
                 get: _get,
+                setData: _setData,
                 getData: _getData,
                 clear: _clear,
                 remove: _remove,

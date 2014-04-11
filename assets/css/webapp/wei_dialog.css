@@ -239,8 +239,8 @@
     position: fixed;
     width: 280px;
     z-index: 1000;
-    left:15px;
-    top:100px;
+    left:-9999px;
+    top:-9999px;
     background-color: #fff;
     border-radius: 5px;
 }
