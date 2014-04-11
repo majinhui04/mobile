@@ -78,6 +78,7 @@ ul.round {
     text-align: center;
     height: 170px;
     overflow: hidden;
+    background-color: #FFD700;
 }
 #page_profile .banner img {
     height: 100%;
