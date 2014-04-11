@@ -1,5 +1,8 @@
 define(function(require, exports, module) {
     require('jquery');
+    var Common = require('common'),
+        MDialog = Common.MDialog,
+        MLoading = Common.MLoading;
 
     var ajaxUrlMap = {
 
